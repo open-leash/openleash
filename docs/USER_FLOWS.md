@@ -8,6 +8,12 @@ Leash Cloud owns Business administration, billing, tenancy, and identity.
 ## Shared requirements
 
 - New user-facing copy says **Leash** and **Features**.
+- Everyday screens call the main protection area **Safety** and explain each
+  choice without assuming security or software knowledge. Technical names and
+  raw scores are reserved for optional details and diagnostics.
+- Configurable Features show a plain-English first layer with recommended
+  choices. Exact scores, model overrides, timing, reuse, and policy controls sit
+  in a discoverable **Advanced settings** section that is collapsed by default.
 - Setup does not show organization, administrator, CISO, employee, directory,
   SSO, dashboard, marketplace, uploader, publisher, rating, or download-count
   choices.
@@ -22,6 +28,27 @@ Leash Cloud owns Business administration, billing, tenancy, and identity.
 - Public pricing presents Personal Free (BYOK), Personal Leash Cloud at $8 per
   month, and Business Leash Cloud at $18 per user per month or $14 per user per
   month with annual billing.
+- Every Cloud offer includes Leash AI and a 10-day free trial. Cloud surfaces
+  never show a provider-key input. Personal Open Source is the only BYOK mode.
+- Once a client has reported in, Personal and Business overview screens lead
+  with a rolling summary of actions monitored, threats blocked, actions that
+  passed safely, actions approved by a person, and actions waiting for review.
+  They also show which threat categories were involved and how many enrolled
+  agents exist for each agent kind. Every count is backed by the same auditable
+  evaluation history; Learning-only actions count as passed safely, never as
+  blocked.
+- Agent enablement and per-agent history live on a dedicated Agents page next
+  to Overview. Connected devices use platform-specific artwork and show their
+  last successful sync time rather than exposing raw hostnames as the primary
+  identity.
+- Desktop settings and the signed-in user's web dashboard are parallel
+  per-user surfaces. Their Overview, agents, Features, approvals, history,
+  notifications, and user settings should use the same client contracts and
+  present the same information wherever the platform allows.
+- A Business employee sees only their own Leash activity and settings on their
+  computer. An administrator who opens Desktop still receives this same
+  employee/user view. Organization administration is web-only and never
+  appears because the local user has an administrator role.
 
 ## 1. Personal Leash Cloud
 
@@ -29,7 +56,7 @@ Entry: desktop, mobile, or marketing website.
 
 1. User chooses Leash Cloud.
 2. Account creation completes in the same personal surface.
-3. User chooses BYOK or Leash-managed evaluation when available.
+3. Leash starts the 10-day trial and confirms that Leash AI is included.
 4. Desktop setup selects agents and installs their hooks/proxy integration.
 5. User sees a real Island preview and explicitly chooses whether to enable it;
    the tray remains installed either way.
@@ -83,14 +110,39 @@ Rules:
 Entry: public marketing website.
 
 1. The visitor selects **Business** in the Personal/Business switcher.
-2. The public site shows $18 per user per month and the $14 per user per month
-   annual price.
+2. The public site shows a 10-day trial for up to 2 employees, followed by $18
+   per user per month or $14 per user per month with annual billing.
 3. The visitor chooses the Business call to action.
 4. The public flow hands off to private Leash Cloud signup or sales onboarding.
-5. Private Leash Cloud owns organization setup, tenancy, billing, identity,
+5. Leash AI and the CISO-style dashboard are included; no provider-key choice
+   is shown.
+6. Private Leash Cloud owns organization setup, tenancy, billing, identity,
    mandatory policy, and support operations.
-6. Installed clients continue using the public client contract against the
+7. Installed clients continue using the public client contract against the
    hosted API; private control-plane code is never imported into the public core.
+8. A CISO or organization administrator can enable **Learning only**. Leash
+   continues evaluating and recording every action for the Business dashboard
+   and audit pipeline, but clients never block or wait for approval.
+9. The CISO or administrator can independently disable employee notifications.
+   Security-team visibility and audit exports continue; enrolled mobile and
+   desktop clients suppress employee-facing approval alerts.
+10. During onboarding, after identity setup, the administrator may optionally
+    connect one or more read-only provider analytics keys. This step is
+    skippable and does not prevent organization activation.
+11. Until a source is connected, **Costs & usage** shows its full navigation and
+    empty dashboard structure with a setup prompt. After sync, the executive
+    view shows budget, spend trend, projects, employees, agents, and models;
+    each employee can be expanded to see attributed projects and agent mix.
+12. Cursor, Claude Code, Claude Enterprise, Anthropic API, OpenAI Platform, and
+    ChatGPT/Codex are separate source types because their official APIs use
+    different credentials and report different dimensions. Connecting an
+    analytics key never changes the runtime evaluation provider.
+13. Every enrolled employee, including an administrator, gets the same
+    per-user Desktop surface as Personal Cloud: their own overview, agents,
+    Features, approvals, history, notifications, and permitted user settings.
+    Organization rosters, aggregate activity and spend, identity sync,
+    organization policy, admin API keys, billing, and audit administration are
+    available only in the private web dashboard.
 
 Private Business onboarding should use the same connection model in Business
 language: create the workspace, connect one pilot computer through Leash
@@ -104,7 +156,8 @@ status and history must not appear populated before a client reports in.
    release.
 3. Each card shows purpose, status, compatible agents, settings, and recent
    outcomes—never publisher or popularity metadata.
-4. The user enables/disables and configures a Feature.
+4. The user enables/disables and configures a Feature. Everyday choices appear
+   first; exact technical controls remain available under **Advanced settings**.
 5. The API validates settings against the manifest schema and saves personal
    base/profile settings.
 6. The next matching event runs the registered handler in-process.
@@ -114,8 +167,11 @@ Leash release.
 
 ## Surface ownership
 
-- `desktop-client`: setup, always-on tray, optional Island, local helper API, hook/proxy management,
-  personal Features, approvals, questions, and updates.
+- `desktop-client`: setup, always-on tray, optional Island, local helper API,
+  hook/proxy management, and the signed-in person's Overview, agents, Features,
+  approvals, questions, history, notifications, permitted settings, and
+  updates. Business membership changes effective policy, not the scope of the
+  local interface; Desktop never becomes an organization-admin console.
 - `mobile-client`: personal approvals, questions, activity, and settings.
 - `main-web`: marketing, downloads, Personal Cloud entry, Business pricing, and
   the private-cloud Business handoff.
@@ -141,5 +197,8 @@ in personal setup, personal settings, or the personal Feature list.
   pull, the flow is wrong.
 - If personal open source uses a duplicate desktop enforcement database instead
   of `client-api` and Postgres, the flow is wrong.
+- If an organization role exposes employee rosters, aggregate organization
+  analytics, identity sync, billing, provider admin keys, or organization
+  policy editing in Desktop, the flow is wrong.
 - If a question/approval cannot resolve the exact originating request, the flow
   is wrong.

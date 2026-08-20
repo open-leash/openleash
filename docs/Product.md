@@ -16,6 +16,17 @@ or multi-tenant administration. Leash may operate private cloud systems for
 hosted accounts, billing, operations, and Business Cloud administration, but
 those systems are not part of this repository or its public API surface.
 
+The desktop settings surface and the signed-in user's web dashboard are two
+clients of the same per-user product. They should converge on the same personal
+overview, agent status, Features, approvals, history, notifications, and
+user-editable settings. A Business employee sees their own Leash activity in
+Desktop exactly as a Personal user does, with organization policy applied by
+the hosted API. An organization administrator also sees only their own user
+surface in Desktop; having an administrator role never unlocks local
+organization controls. Organization-wide people, policy, identity, billing,
+cost-source, audit-export, and CISO/CIO views are available only in the private
+web dashboard.
+
 ## Product offers
 
 ### Personal, Free (BYOK)
@@ -39,7 +50,13 @@ Price: **Free**.
 ### Personal, Leash Cloud
 
 - Desktop, web, and mobile use the Leash-hosted personal `client-api` surface.
-- Leash-managed evaluation may be offered.
+- Leash AI is included; Cloud never asks for or accepts a customer model-provider key.
+- A 10-day free trial starts at first Cloud sign-in with no card required.
+- Cloud keeps protection, approvals, history, and settings available across devices.
+- The connected Personal overview leads with a rolling activity summary: actions
+  checked, attacks or sensitive actions blocked, automatic approvals, manual
+  approvals, pending decisions, the leading threat categories, and enrolled
+  agent counts grouped by kind.
 - Hosted tenancy, billing, abuse controls, production credentials, signing,
   support, and operations live in private Leash Cloud code.
 - Public code exposes provider interfaces and personal client contracts; it does
@@ -54,8 +71,36 @@ Price: **$8 per month**.
 - Business clients use Leash Cloud; organization administration, tenancy,
   billing, identity, mandatory policy, support, and operations remain private
   Leash Cloud systems.
+- Leash AI and the CISO-style Business dashboard are included.
+- The Business dashboard leads with the same rolling outcome, threat-category,
+  and agent-kind summary across the organization so security leaders can see
+  what Leash stopped and what it allowed without opening individual events.
+- Private Business settings provide two independent organization controls:
+  **Learning only** keeps evaluation, proxying, audit history, and security-team
+  visibility active while allowing actions that otherwise would be blocked or
+  held for approval; **Employee notifications** may be disabled without
+  suppressing dashboard activity or audit exports.
+- Private Business cost intelligence groups organization AI spend by provider,
+  agent, model, employee, and project. Provider-native project IDs are
+  authoritative; when a provider supplies user-level cost but no project,
+  Leash may label the row from same-day enrolled-agent activity and clearly
+  marks that label as inferred.
+- Cost sources are optional, read-only administration/analytics credentials,
+  separate from Leash AI evaluation credentials. A Business organization may
+  connect multiple Cursor teams, Claude Platform or Claude Enterprise
+  organizations, OpenAI Platform organizations, and ChatGPT/Codex workspaces.
+  The empty cost dashboard remains visible before setup and directs an
+  administrator to the skippable connection step.
+- A 10-day free trial covers up to 2 employees; adding more employees requires
+  a paid subscription.
 - Public clients and the public core do not import or expose the private
   Business control plane.
+- Business Desktop remains a per-user client. It may explain that a setting is
+  managed by the organization, but it never exposes employee rosters,
+  organization analytics, provider administration keys, directory sync,
+  billing, organization policy editing, or other administrator actions. Even
+  an organization administrator uses the private web dashboard for those
+  actions.
 - Built-in Features still execute through the typed `client-api` registry. A
   Business plan does not create a third-party Feature or arbitrary-code path.
 
@@ -124,15 +169,32 @@ policy, when offered, is a private Leash Cloud overlay and is not implemented by
 the public product.
 
 Rules discovered from `CLAUDE.md`, `AGENTS.md`, and other agent instruction
-files are suggestions. The user explicitly selects which discovered rules the
-Leash Rules Protection Feature should enforce.
+files are suggestions. The user explicitly selects which discovered rules
+Rules Protection should enforce.
 
-The canonical customer-facing Feature names are **Leash Destructive
-Protection**, **Leash Code Protection**, **Leash Private Data Protection**,
-**Leash Secret Protection**, **Leash Prompt Injection Protection**, **Leash
-Tool Protection**, **Leash Rules Protection**, and **Leash Token Saver**. Public
-copy uses these names consistently. Stable slugs and IDs remain implementation
-details for compatibility and are not used as marketing names.
+The canonical customer-facing Feature names are **Destructive Protection**,
+**Code Protection**, **Private Data Protection**, **Password Protection**,
+**Prompt Injection Protection**, **Connected Apps Protection**, **Rules
+Protection**, and **Token Saver**. Public copy uses
+these names consistently. Stable slugs and IDs remain implementation details
+for compatibility and are not used as marketing names.
+
+Normal product screens use outcome language that a first-time AI user can
+understand. They explain what AI tried to do, what could happen, and what Leash
+did. Internal terms such as prompt injection, MCP, exfiltration, risk threshold,
+SSRF, CSRF, token compression, policy evaluation, and stable Feature IDs belong
+only in optional technical details, diagnostics, logs, or developer docs. Raw
+engine scores are not normal settings: present them as plain choices such as
+**Warn me more**, **Balanced**, and **Only strong warnings** while preserving
+their numeric values in the API contract.
+
+Every configurable Feature uses progressive disclosure. The first layer shows
+plain recommended choices and describes their real-world effect. A clearly
+labeled, collapsed **Advanced settings** section may expose exact scores, model
+overrides, timing and reuse values, policy sets, and other controls needed by a
+technical operator. Advanced settings remain discoverable, but opening them does
+not replace the plain explanation, recommended default, or description of what
+changing the value will do.
 
 ## Agent event pipeline
 
@@ -151,10 +213,19 @@ Hooks and proxy events describing the same action are deduplicated before
 Feature execution. Feature handlers use declared event capabilities rather than
 guessing from the agent name.
 
+The public client API accepts a typed runtime-policy provider from a private
+Business deployment. The public core does not store or administer organization
+policy. When the provider returns learning mode, the original evaluation and
+Feature outcomes remain durable while the effective agent response is `allow`;
+an `ask` outcome is marked resolved by the organization mode so no request is
+left waiting. Notification delivery consults the same provider independently.
+
 The cross-platform Rust `local-proxy` is separate from Feature execution. It
 submits normalized requests to `client-api`, which runs enabled Features in
 process, persists outcomes, and returns the decision. It never invokes a Feature
-directly.
+directly. The desktop package bundles and runs the native proxy executable;
+Personal and Business Cloud customers do not need Docker. Personal Open Source
+may still use Docker to package Postgres and its local `client-api`.
 
 A user may pause monitoring for one exact conversation for at most 30 minutes.
 The pause stays visible and resumable and never becomes a global fail-open mode.
